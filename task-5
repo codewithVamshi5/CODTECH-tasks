@@ -1,0 +1,320 @@
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.swing.*;
+import java.awt.event.*;
+
+class BankAccount {
+    private String accountNumber;
+    private double balance;
+    private List<Transaction> transactions;
+
+    public BankAccount(String accountNumber, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.balance = initialBalance;
+        this.transactions = new ArrayList<>();
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            transactions.add(new Transaction("Deposit", amount));
+        }
+    }
+
+    public boolean withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            transactions.add(new Transaction("Withdrawal", amount));
+            return true;
+        }
+        return false;
+    }
+
+    public boolean transfer(BankAccount targetAccount, double amount) {
+        if (withdraw(amount)) {
+            targetAccount.deposit(amount);
+            transactions.add(new Transaction("Transfer to " + targetAccount.getAccountNumber(), amount));
+            targetAccount.transactions.add(new Transaction("Transfer from " + this.accountNumber, amount));
+            return true;
+        }
+        return false;
+    }
+
+    public List<Transaction> getTransactionHistory() {
+        return transactions;
+    }
+}
+
+class Transaction {
+    private String type;
+    private double amount;
+    private Date date;
+
+    public Transaction(String type, double amount) {
+        this.type = type;
+        this.amount = amount;
+        this.date = new Date(); // Set transaction date to current time
+    }
+
+    @Override
+    public String toString() {
+        return type + ": $" + amount + " on " + date.toString();
+    }
+}
+
+class User {
+    private String username;
+    private String password;
+    private String name;
+    private String address;
+    private BankAccount bankAccount;
+
+    public User(String username, String password, String name, String address, String accountNumber, double initialBalance) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.address = address;
+        this.bankAccount = new BankAccount(accountNumber, initialBalance);
+    }
+
+    // Getters and Setters
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public BankAccount getBankAccount() {
+        return bankAccount;
+    }
+
+    public void updateInfo(String name, String address) {
+        this.name = name;
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return "User: " + name + ", Address: " + address;
+    }
+}
+
+class BankingSystem {
+    private List<User> users;
+
+    public BankingSystem() {
+        users = new ArrayList<>();
+    }
+
+    // Create a new user and bank account
+    public void createUser(String username, String password, String name, String address, String accountNumber, double initialBalance) {
+        users.add(new User(username, password, name, address, accountNumber, initialBalance));
+    }
+
+    // Find a user by username and password
+    public User authenticate(String username, String password) {
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    // List all users (admin feature)
+    public List<User> getUsers() {
+        return users;
+    }
+}
+
+public class BankingSystemGUI {
+    private JFrame frame;
+    private BankingSystem bankingSystem;
+
+    public BankingSystemGUI() {
+        bankingSystem = new BankingSystem();
+
+        // Prepopulate with a sample user for testing
+        bankingSystem.createUser("john_doe", "password123", "John Doe", "123 Main St", "ACC1001", 5000);
+
+        frame = new JFrame("Online Banking System");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        displayLoginScreen();
+    }
+
+    private void displayLoginScreen() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 600, 400);
+
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setBounds(100, 100, 80, 25);
+        panel.add(usernameLabel);
+
+        JTextField usernameField = new JTextField(20);
+        usernameField.setBounds(200, 100, 165, 25);
+        panel.add(usernameField);
+
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setBounds(100, 140, 80, 25);
+        panel.add(passwordLabel);
+
+        JPasswordField passwordField = new JPasswordField(20);
+        passwordField.setBounds(200, 140, 165, 25);
+        panel.add(passwordField);
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(200, 180, 100, 25);
+        panel.add(loginButton);
+
+        JLabel loginStatus = new JLabel("");
+        loginStatus.setBounds(100, 220, 400, 25);
+        panel.add(loginStatus);
+
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+                User user = bankingSystem.authenticate(username, password);
+                if (user != null) {
+                    loginStatus.setText("Login successful! Welcome " + user.toString());
+                    displayAccountDashboard(user);
+                } else {
+                    loginStatus.setText("Login failed. Invalid username or password.");
+                }
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayAccountDashboard(User user) {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 600, 400);
+
+        JLabel welcomeLabel = new JLabel("Welcome, " + user.toString());
+        welcomeLabel.setBounds(100, 20, 400, 25);
+        panel.add(welcomeLabel);
+
+        JLabel balanceLabel = new JLabel("Account Balance: $" + user.getBankAccount().getBalance());
+        balanceLabel.setBounds(100, 60, 400, 25);
+        panel.add(balanceLabel);
+
+        JButton depositButton = new JButton("Deposit");
+        depositButton.setBounds(100, 100, 100, 25);
+        panel.add(depositButton);
+
+        JButton withdrawButton = new JButton("Withdraw");
+        withdrawButton.setBounds(210, 100, 100, 25);
+        panel.add(withdrawButton);
+
+        JButton transferButton = new JButton("Transfer");
+        transferButton.setBounds(320, 100, 100, 25);
+        panel.add(transferButton);
+
+        JButton transactionHistoryButton = new JButton("Transaction History");
+        transactionHistoryButton.setBounds(100, 150, 150, 25);
+        panel.add(transactionHistoryButton);
+
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setBounds(100, 200, 100, 25);
+        panel.add(logoutButton);
+
+        depositButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String amountStr = JOptionPane.showInputDialog(frame, "Enter deposit amount:");
+                try {
+                    double amount = Double.parseDouble(amountStr);
+                    user.getBankAccount().deposit(amount);
+                    balanceLabel.setText("Account Balance: $" + user.getBankAccount().getBalance());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid amount.");
+                }
+            }
+        });
+
+        withdrawButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String amountStr = JOptionPane.showInputDialog(frame, "Enter withdrawal amount:");
+                try {
+                    double amount = Double.parseDouble(amountStr);
+                    if (user.getBankAccount().withdraw(amount)) {
+                        balanceLabel.setText("Account Balance: $" + user.getBankAccount().getBalance());
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Insufficient funds.");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid amount.");
+                }
+            }
+        });
+
+        transferButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String targetAccountNumber = JOptionPane.showInputDialog(frame, "Enter target account number:");
+                String amountStr = JOptionPane.showInputDialog(frame, "Enter transfer amount:");
+                try {
+                    double amount = Double.parseDouble(amountStr);
+                    for (User targetUser : bankingSystem.getUsers()) {
+                        if (targetUser.getBankAccount().getAccountNumber().equals(targetAccountNumber)) {
+                            if (user.getBankAccount().transfer(targetUser.getBankAccount(), amount)) {
+                                balanceLabel.setText("Account Balance: $" + user.getBankAccount().getBalance());
+                                JOptionPane.showMessageDialog(frame, "Transfer successful.");
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Insufficient funds.");
+                            }
+                            return;
+                        }
+                    }
+                    JOptionPane.showMessageDialog(frame, "Target account not found.");
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Invalid amount.");
+                }
+            }
+        });
+
+        transactionHistoryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                StringBuilder history = new StringBuilder();
+                for (Transaction transaction : user.getBankAccount().getTransactionHistory()) {
+                    history.append(transaction.toString()).append("\n");
+                }
+                JOptionPane.showMessageDialog(frame, history.toString());
+            }
+        });
+
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayLoginScreen();
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    public static void main(String[] args) {
+        new BankingSystemGUI();
+    }
+}

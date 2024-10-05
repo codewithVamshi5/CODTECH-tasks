@@ -1,0 +1,91 @@
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class StudentGradesManager {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<Double> grades = new ArrayList<>();
+        String moreGrades = "yes";
+
+        System.out.println("Welcome to the Student Grades Manager!");
+
+        // Collecting grades for different subjects or assignments
+        while (moreGrades.equalsIgnoreCase("yes")) {
+            System.out.print("Enter grade (0-100): ");
+            double grade = getValidGrade(scanner);
+            grades.add(grade);
+
+            System.out.print("Do you want to enter more grades? (yes/no): ");
+            moreGrades = scanner.next();
+        }
+
+        // Calculate average grade
+        double average = calculateAverage(grades);
+
+        // Output results
+        System.out.println("\n--- Grade Report ---");
+        System.out.println("Average Grade: " + average + "%");
+        System.out.println("Letter Grade: " + getLetterGrade(average));
+        System.out.println("GPA: " + getGPA(average));
+
+        scanner.close();
+    }
+
+    // Method to get a valid grade input
+    private static double getValidGrade(Scanner scanner) {
+        while (true) {
+            try {
+                double grade = scanner.nextDouble();
+                if (grade >= 0 && grade <= 100) {
+                    return grade;
+                } else {
+                    System.out.print("Invalid input. Please enter a grade between 0 and 100: ");
+                }
+            } catch (InputMismatchException e) {
+                System.out.print("Invalid input. Please enter a number between 0 and 100: ");
+                scanner.next(); // Clear invalid input
+            }
+        }
+    }
+
+    // Method to calculate the average of grades
+    private static double calculateAverage(ArrayList<Double> grades) {
+        double sum = 0;
+        for (double grade : grades) {
+            sum += grade;
+        }
+        return sum / grades.size();
+    }
+
+    // Method to get the letter grade based on average grade
+    private static String getLetterGrade(double average) {
+        if (average >= 90) {
+            return "A";
+        } else if (average >= 80) {
+            return "B";
+        } else if (average >= 70) {
+            return "C";
+        } else if (average >= 60) {
+            return "D";
+        } else {
+            return "F";
+        }
+    }
+
+    // Method to get the GPA based on average grade
+    private static double getGPA(double average) {
+        if (average >= 90) {
+            return 4.0;
+        } else if (average >= 80) {
+            return 3.0;
+        } else if (average >= 70) {
+            return 2.0;
+        } else if (average >= 60) {
+            return 1.0;
+        } else {
+            return 0.0;
+        }
+    }
+}

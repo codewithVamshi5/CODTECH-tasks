@@ -1,0 +1,651 @@
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.swing.*;
+import java.awt.event.*;
+
+// Patient Class
+class Patient {
+    private String id;
+    private String name;
+    private String address;
+    private String phone;
+
+    public Patient(String id, String name, String address, String phone) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Patient ID: " + id + ", Name: " + name;
+    }
+}
+
+// Appointment Class
+class Appointment {
+    private Patient patient;
+    private Date date;
+    private String doctor;
+    private String reason;
+
+    public Appointment(Patient patient, Date date, String doctor, String reason) {
+        this.patient = patient;
+        this.date = date;
+        this.doctor = doctor;
+        this.reason = reason;
+    }
+
+    @Override
+    public String toString() {
+        return "Appointment with Dr. " + doctor + " on " + date + " for " + reason + " (Patient: " + patient.getName() + ")";
+    }
+}
+
+// Electronic Health Record (EHR) Class
+class EHR {
+    private Patient patient;
+    private String medicalHistory;
+
+    public EHR(Patient patient) {
+        this.patient = patient;
+        this.medicalHistory = "";
+    }
+
+    public void addMedicalHistory(String record) {
+        medicalHistory += record + "\n";
+    }
+
+    @Override
+    public String toString() {
+        return "EHR for " + patient.getName() + ":\n" + medicalHistory;
+    }
+}
+
+// Billing Class
+class Bill {
+    private Patient patient;
+    private double amount;
+
+    public Bill(Patient patient, double amount) {
+        this.patient = patient;
+        this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return "Bill for " + patient.getName() + ": $" + amount;
+    }
+}
+
+// Inventory Class
+class Inventory {
+    private String itemName;
+    private int quantity;
+
+    public Inventory(String itemName, int quantity) {
+        this.itemName = itemName;
+        this.quantity = quantity;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void updateQuantity(int amount) {
+        quantity += amount;
+    }
+
+    @Override
+    public String toString() {
+        return itemName + ": " + quantity + " available";
+    }
+}
+
+// Staff Class
+class Staff {
+    private String id;
+    private String name;
+    private String role;
+
+    public Staff(String id, String name, String role) {
+        this.id = id;
+        this.name = name;
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "Staff ID: " + id + ", Name: " + name + ", Role: " + role;
+    }
+}
+
+// Hospital Management System Class
+class HospitalManagementSystem {
+    private List<Patient> patients;
+    private List<Appointment> appointments;
+    private List<EHR> records;
+    private List<Bill> bills;
+    private List<Inventory> inventory;
+    private List<Staff> staff;
+
+    public HospitalManagementSystem() {
+        patients = new ArrayList<>();
+        appointments = new ArrayList<>();
+        records = new ArrayList<>();
+        bills = new ArrayList<>();
+        inventory = new ArrayList<>();
+        staff = new ArrayList<>();
+    }
+
+    // Add Patient
+    public void addPatient(String id, String name, String address, String phone) {
+        patients.add(new Patient(id, name, address, phone));
+    }
+
+    // Schedule Appointment
+    public void scheduleAppointment(Patient patient, Date date, String doctor, String reason) {
+        appointments.add(new Appointment(patient, date, doctor, reason));
+    }
+
+    // Add EHR
+    public void addEHR(Patient patient, String medicalHistory) {
+        EHR ehr = new EHR(patient);
+        ehr.addMedicalHistory(medicalHistory);
+        records.add(ehr);
+    }
+
+    // Generate Bill
+    public void generateBill(Patient patient, double amount) {
+        bills.add(new Bill(patient, amount));
+    }
+
+    // Manage Inventory
+    public void manageInventory(String itemName, int quantity) {
+        inventory.add(new Inventory(itemName, quantity));
+    }
+
+    // Add Staff
+    public void addStaff(String id, String name, String role) {
+        staff.add(new Staff(id, name, role));
+    }
+
+    // Getters
+    public List<Patient> getPatients() {
+        return patients;
+    }
+
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public List<EHR> getRecords() {
+        return records;
+    }
+
+    public List<Bill> getBills() {
+        return bills;
+    }
+
+    public List<Inventory> getInventory() {
+        return inventory;
+    }
+
+    public List<Staff> getStaff() {
+        return staff;
+    }
+}
+
+// GUI for Hospital Management System
+public class HospitalManagementSystemGUI {
+    private JFrame frame;
+    private HospitalManagementSystem hospitalSystem;
+
+    public HospitalManagementSystemGUI() {
+        hospitalSystem = new HospitalManagementSystem();
+        frame = new JFrame("Hospital Management System");
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+        displayMainMenu();
+    }
+
+    private void displayMainMenu() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("Hospital Management System");
+        titleLabel.setBounds(250, 20, 300, 25);
+        panel.add(titleLabel);
+
+        JButton registerPatientButton = new JButton("Register Patient");
+        registerPatientButton.setBounds(300, 70, 200, 30);
+        panel.add(registerPatientButton);
+
+        JButton scheduleAppointmentButton = new JButton("Schedule Appointment");
+        scheduleAppointmentButton.setBounds(300, 110, 200, 30);
+        panel.add(scheduleAppointmentButton);
+
+        JButton viewEHRButton = new JButton("View EHR");
+        viewEHRButton.setBounds(300, 150, 200, 30);
+        panel.add(viewEHRButton);
+
+        JButton generateBillButton = new JButton("Generate Bill");
+        generateBillButton.setBounds(300, 190, 200, 30);
+        panel.add(generateBillButton);
+
+        JButton manageInventoryButton = new JButton("Manage Inventory");
+        manageInventoryButton.setBounds(300, 230, 200, 30);
+        panel.add(manageInventoryButton);
+
+        JButton addStaffButton = new JButton("Add Staff");
+        addStaffButton.setBounds(300, 270, 200, 30);
+        panel.add(addStaffButton);
+
+        JButton exitButton = new JButton("Exit");
+        exitButton.setBounds(300, 310, 200, 30);
+        panel.add(exitButton);
+
+        registerPatientButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayRegisterPatient();
+            }
+        });
+
+        scheduleAppointmentButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayScheduleAppointment();
+            }
+        });
+
+        viewEHRButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayViewEHR();
+            }
+        });
+
+        generateBillButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayGenerateBill();
+            }
+        });
+
+        manageInventoryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayManageInventory();
+            }
+        });
+
+        addStaffButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayAddStaff();
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayRegisterPatient() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("Register Patient");
+        titleLabel.setBounds(320, 20, 200, 25);
+        panel.add(titleLabel);
+
+        JLabel idLabel = new JLabel("Patient ID:");
+        idLabel.setBounds(100, 60, 100, 25);
+        panel.add(idLabel);
+
+        JTextField idField = new JTextField(20);
+        idField.setBounds(200, 60, 200, 25);
+        panel.add(idField);
+
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setBounds(100, 100, 100, 25);
+        panel.add(nameLabel);
+
+        JTextField nameField = new JTextField(20);
+        nameField.setBounds(200, 100, 200, 25);
+        panel.add(nameField);
+
+        JLabel addressLabel = new JLabel("Address:");
+        addressLabel.setBounds(100, 140, 100, 25);
+        panel.add(addressLabel);
+
+        JTextField addressField = new JTextField(20);
+        addressField.setBounds(200, 140, 200, 25);
+        panel.add(addressField);
+
+        JLabel phoneLabel = new JLabel("Phone:");
+        phoneLabel.setBounds(100, 180, 100, 25);
+        panel.add(phoneLabel);
+
+        JTextField phoneField = new JTextField(20);
+        phoneField.setBounds(200, 180, 200, 25);
+        panel.add(phoneField);
+
+        JButton registerButton = new JButton("Register");
+        registerButton.setBounds(250, 220, 100, 30);
+        panel.add(registerButton);
+
+        registerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String id = idField.getText();
+                String name = nameField.getText();
+                String address = addressField.getText();
+                String phone = phoneField.getText();
+                hospitalSystem.addPatient(id, name, address, phone);
+                JOptionPane.showMessageDialog(frame, "Patient Registered: " + name);
+                displayMainMenu();
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayScheduleAppointment() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("Schedule Appointment");
+        titleLabel.setBounds(300, 20, 250, 25);
+        panel.add(titleLabel);
+
+        JLabel patientIdLabel = new JLabel("Patient ID:");
+        patientIdLabel.setBounds(100, 60, 100, 25);
+        panel.add(patientIdLabel);
+
+        JTextField patientIdField = new JTextField(20);
+        patientIdField.setBounds(200, 60, 200, 25);
+        panel.add(patientIdField);
+
+        JLabel doctorLabel = new JLabel("Doctor Name:");
+        doctorLabel.setBounds(100, 100, 100, 25);
+        panel.add(doctorLabel);
+
+        JTextField doctorField = new JTextField(20);
+        doctorField.setBounds(200, 100, 200, 25);
+        panel.add(doctorField);
+
+        JLabel reasonLabel = new JLabel("Reason:");
+        reasonLabel.setBounds(100, 140, 100, 25);
+        panel.add(reasonLabel);
+
+        JTextField reasonField = new JTextField(20);
+        reasonField.setBounds(200, 140, 200, 25);
+        panel.add(reasonField);
+
+        JLabel dateLabel = new JLabel("Date (MM/DD/YYYY):");
+        dateLabel.setBounds(100, 180, 150, 25);
+        panel.add(dateLabel);
+
+        JTextField dateField = new JTextField(20);
+        dateField.setBounds(250, 180, 150, 25);
+        panel.add(dateField);
+
+        JButton scheduleButton = new JButton("Schedule");
+        scheduleButton.setBounds(250, 220, 100, 30);
+        panel.add(scheduleButton);
+
+        scheduleButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String patientId = patientIdField.getText();
+                String doctor = doctorField.getText();
+                String reason = reasonField.getText();
+                String dateString = dateField.getText();
+                // Parse date
+                String[] dateParts = dateString.split("/");
+                Date date = new Date(Integer.parseInt(dateParts[2]) - 1900, Integer.parseInt(dateParts[0]) - 1, Integer.parseInt(dateParts[1]));
+                for (Patient patient : hospitalSystem.getPatients()) {
+                    if (patient.getId().equals(patientId)) {
+                        hospitalSystem.scheduleAppointment(patient, date, doctor, reason);
+                        JOptionPane.showMessageDialog(frame, "Appointment Scheduled!");
+                        displayMainMenu();
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "Patient ID not found.");
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayViewEHR() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("View EHR");
+        titleLabel.setBounds(320, 20, 200, 25);
+        panel.add(titleLabel);
+
+        JLabel patientIdLabel = new JLabel("Patient ID:");
+        patientIdLabel.setBounds(100, 60, 100, 25);
+        panel.add(patientIdLabel);
+
+        JTextField patientIdField = new JTextField(20);
+        patientIdField.setBounds(200, 60, 200, 25);
+        panel.add(patientIdField);
+
+        JButton viewButton = new JButton("View EHR");
+        viewButton.setBounds(250, 100, 100, 30);
+        panel.add(viewButton);
+
+        viewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String patientId = patientIdField.getText();
+                for (EHR ehr : hospitalSystem.getRecords()) {
+                    if (ehr.toString().contains(patientId)) {
+                        JOptionPane.showMessageDialog(frame, ehr);
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "EHR not found for Patient ID: " + patientId);
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayGenerateBill() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("Generate Bill");
+        titleLabel.setBounds(320, 20, 200, 25);
+        panel.add(titleLabel);
+
+        JLabel patientIdLabel = new JLabel("Patient ID:");
+        patientIdLabel.setBounds(100, 60, 100, 25);
+        panel.add(patientIdLabel);
+
+        JTextField patientIdField = new JTextField(20);
+        patientIdField.setBounds(200, 60, 200, 25);
+        panel.add(patientIdField);
+
+        JLabel amountLabel = new JLabel("Amount:");
+        amountLabel.setBounds(100, 100, 100, 25);
+        panel.add(amountLabel);
+
+        JTextField amountField = new JTextField(20);
+        amountField.setBounds(200, 100, 200, 25);
+        panel.add(amountField);
+
+        JButton generateButton = new JButton("Generate Bill");
+        generateButton.setBounds(250, 140, 150, 30);
+        panel.add(generateButton);
+
+        generateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String patientId = patientIdField.getText();
+                double amount = Double.parseDouble(amountField.getText());
+                for (Patient patient : hospitalSystem.getPatients()) {
+                    if (patient.getId().equals(patientId)) {
+                        hospitalSystem.generateBill(patient, amount);
+                        JOptionPane.showMessageDialog(frame, "Bill Generated!");
+                        displayMainMenu();
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, "Patient ID not found.");
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayManageInventory() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("Manage Inventory");
+        titleLabel.setBounds(320, 20, 200, 25);
+        panel.add(titleLabel);
+
+        JLabel itemNameLabel = new JLabel("Item Name:");
+        itemNameLabel.setBounds(100, 60, 100, 25);
+        panel.add(itemNameLabel);
+
+        JTextField itemNameField = new JTextField(20);
+        itemNameField.setBounds(200, 60, 200, 25);
+        panel.add(itemNameField);
+
+        JLabel quantityLabel = new JLabel("Quantity:");
+        quantityLabel.setBounds(100, 100, 100, 25);
+        panel.add(quantityLabel);
+
+        JTextField quantityField = new JTextField(20);
+        quantityField.setBounds(200, 100, 200, 25);
+        panel.add(quantityField);
+
+        JButton addButton = new JButton("Add to Inventory");
+        addButton.setBounds(250, 140, 150, 30);
+        panel.add(addButton);
+
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String itemName = itemNameField.getText();
+                int quantity = Integer.parseInt(quantityField.getText());
+                hospitalSystem.manageInventory(itemName, quantity);
+                JOptionPane.showMessageDialog(frame, "Item Added to Inventory!");
+                displayMainMenu();
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void displayAddStaff() {
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBounds(0, 0, 800, 600);
+
+        JLabel titleLabel = new JLabel("Add Staff");
+        titleLabel.setBounds(320, 20, 200, 25);
+        panel.add(titleLabel);
+
+        JLabel idLabel = new JLabel("Staff ID:");
+        idLabel.setBounds(100, 60, 100, 25);
+        panel.add(idLabel);
+
+        JTextField idField = new JTextField(20);
+        idField.setBounds(200, 60, 200, 25);
+        panel.add(idField);
+
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setBounds(100, 100, 100, 25);
+        panel.add(nameLabel);
+
+        JTextField nameField = new JTextField(20);
+        nameField.setBounds(200, 100, 200, 25);
+        panel.add(nameField);
+
+        JLabel roleLabel = new JLabel("Role:");
+        roleLabel.setBounds(100, 140, 100, 25);
+        panel.add(roleLabel);
+
+        JTextField roleField = new JTextField(20);
+        roleField.setBounds(200, 140, 200, 25);
+        panel.add(roleField);
+
+        JButton addButton = new JButton("Add Staff");
+        addButton.setBounds(250, 180, 150, 30);
+        panel.add(addButton);
+
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String id = idField.getText();
+                String name = nameField.getText();
+                String role = roleField.getText();
+                hospitalSystem.addStaff(id, name, role);
+                JOptionPane.showMessageDialog(frame, "Staff Added: " + name);
+                displayMainMenu();
+            }
+        });
+
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(panel);
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new HospitalManagementSystemGUI();
+            }
+        });
+    }
+}

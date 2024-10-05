@@ -1,0 +1,265 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+abstract class LibraryItem {
+    private String title;
+    private String author;
+    private String category;
+    private boolean isAvailable;
+    private Date dueDate;
+
+    public LibraryItem(String title, String author, String category) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+        this.isAvailable = true; // default to available
+    }
+
+    // Getters and setters
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getCategory() { return category; }
+    public boolean isAvailable() { return isAvailable; }
+    public void setAvailable(boolean available) { isAvailable = available; }
+    public Date getDueDate() { return dueDate; }
+    public void setDueDate(Date dueDate) { this.dueDate = dueDate; }
+
+    @Override
+    public String toString() {
+        return "Title: " + title + ", Author: " + author + ", Category: " + category + ", Available: " + isAvailable;
+    }
+}
+
+class Book extends LibraryItem {
+    public Book(String title, String author, String category) {
+        super(title, author, category);
+    }
+}
+
+class Magazine extends LibraryItem {
+    public Magazine(String title, String author, String category) {
+        super(title, author, category);
+    }
+}
+
+class DVD extends LibraryItem {
+    public DVD(String title, String director, String category) {
+        super(title, director, category);
+    }
+}
+
+abstract class User {
+    private String username;
+    private String password;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    // Getters
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+
+    // Abstract methods to be overridden by Librarian and Patron
+    public abstract void checkOutItem(LibraryItem item);
+    public abstract void returnItem(LibraryItem item);
+}
+
+class Librarian extends User {
+    public Librarian(String username, String password) {
+        super(username, password);
+    }
+
+    @Override
+    public void checkOutItem(LibraryItem item) {
+        if (item.isAvailable()) {
+            item.setAvailable(false);
+            item.setDueDate(new Date());  // In a real system, this would be a future date
+            System.out.println("Item checked out successfully.");
+        } else {
+            System.out.println("Item is not available for checkout.");
+        }
+    }
+
+    @Override
+    public void returnItem(LibraryItem item) {
+        item.setAvailable(true);
+        item.setDueDate(null);
+        System.out.println("Item returned successfully.");
+    }
+
+    // Librarian-specific functionality to add new items to the library
+    public void addNewItem(LibraryItem item, LibrarySystem library) {
+        library.addItem(item);
+        System.out.println("Item added to the library.");
+    }
+
+    public void deleteItem(LibraryItem item, LibrarySystem library) {
+        library.removeItem(item);
+        System.out.println("Item removed from the library.");
+    }
+}
+
+class Patron extends User {
+    public Patron(String username, String password) {
+        super(username, password);
+    }
+
+    @Override
+    public void checkOutItem(LibraryItem item) {
+        if (item.isAvailable()) {
+            item.setAvailable(false);
+            item.setDueDate(new Date());  // In a real system, this would be a future date
+            System.out.println("Item checked out successfully.");
+        } else {
+            System.out.println("Item is not available for checkout.");
+        }
+    }
+
+    @Override
+    public void returnItem(LibraryItem item) {
+        item.setAvailable(true);
+        item.setDueDate(null);
+        System.out.println("Item returned successfully.");
+    }
+}
+
+class LibrarySystem {
+    private List<LibraryItem> items = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
+
+    // Method to add item to the library
+    public void addItem(LibraryItem item) {
+        items.add(item);
+    }
+
+    // Method to remove an item
+    public void removeItem(LibraryItem item) {
+        items.remove(item);
+    }
+
+    // Method to search for items by title, author, or category
+    public void searchItem(String keyword) {
+        for (LibraryItem item : items) {
+            if (item.getTitle().contains(keyword) || item.getAuthor().contains(keyword) || item.getCategory().contains(keyword)) {
+                System.out.println(item);
+            }
+        }
+    }
+
+    // Method to add a user (librarian or patron)
+    public void addUser(User user) {
+        users.add(user);
+    }
+
+    // Method to get user by username
+    public User getUser(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null; // Return null if not found
+    }
+
+    // Method to return all library items
+    public List<LibraryItem> getItems() {
+        return items;
+    }
+}
+
+public class LibraryManagementSystemGUI {
+    private JFrame frame;
+    private LibrarySystem library;
+
+    public LibraryManagementSystemGUI() {
+        library = new LibrarySystem();
+
+        // Add some users and items for testing purposes
+        initializeSampleData();
+
+        frame = new JFrame("Library Management System");
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.getContentPane().add(panel);
+        placeComponents(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void placeComponents(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel userLabel = new JLabel("Username:");
+        userLabel.setBounds(10, 20, 80, 25);
+        panel.add(userLabel);
+
+        JTextField userText = new JTextField(20);
+        userText.setBounds(100, 20, 165, 25);
+        panel.add(userText);
+
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setBounds(10, 50, 80, 25);
+        panel.add(passwordLabel);
+
+        JPasswordField passwordText = new JPasswordField(20);
+        passwordText.setBounds(100, 50, 165, 25);
+        panel.add(passwordText);
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(10, 80, 80, 25);
+        panel.add(loginButton);
+
+        JTextArea resultArea = new JTextArea();
+        resultArea.setBounds(10, 110, 450, 350);
+        resultArea.setEditable(false);
+        panel.add(resultArea);
+
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String username = userText.getText();
+                String password = new String(passwordText.getPassword());
+
+                User user = library.getUser(username);
+                if (user != null && user.getPassword().equals(password)) {
+                    if (user instanceof Librarian) {
+                        resultArea.setText("Welcome, Librarian!\n");
+                        resultArea.append("You can add, delete, and manage library items.\n");
+                    } else if (user instanceof Patron) {
+                        resultArea.setText("Welcome, Patron!\n");
+                        resultArea.append("You can search and check out items.\n");
+                    }
+                } else {
+                    resultArea.setText("Invalid username or password.");
+                }
+            }
+        });
+    }
+
+    private void initializeSampleData() {
+        Librarian librarian = new Librarian("admin", "admin123");
+        Patron patron = new Patron("john_doe", "password");
+
+        library.addUser(librarian);
+        library.addUser(patron);
+
+        Book book = new Book("Effective Java", "Joshua Bloch", "Programming");
+        Magazine magazine = new Magazine("Tech Today", "Jane Doe", "Technology");
+        DVD dvd = new DVD("The Matrix", "Wachowski", "Movie");
+
+        library.addItem(book);
+        library.addItem(magazine);
+        library.addItem(dvd);
+    }
+
+    public static void main(String[] args) {
+        new LibraryManagementSystemGUI();
+    }
+}
